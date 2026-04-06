@@ -15,7 +15,7 @@ If you discover a security vulnerability, please report it responsibly.
 Instead, use one of these methods:
 
 1. **GitHub Security Advisories** (preferred): Use the "Report a vulnerability" button on the Security tab of this repository.
-2. **Email**: Send details to [admin@greyforgelabs.com](mailto:admin@greyforgelabs.com).
+2. **Email**: Send details to [admin@greyforge.tech](mailto:admin@greyforge.tech).
 
 ## What to Include
 
