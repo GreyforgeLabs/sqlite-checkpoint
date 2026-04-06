@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# PROJECT_NAME setup script
+# sqlite-checkpoint setup script
 # Idempotent - safe to run multiple times
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
-echo "=== PROJECT_NAME Setup ==="
+echo "=== sqlite-checkpoint Setup ==="
 
 check_command() {
     if ! command -v "$1" &> /dev/null; then
@@ -16,39 +16,31 @@ check_command() {
     fi
 }
 
-# Uncomment and modify as needed:
-# check_command python3
-# check_command node
-# check_command cargo
+check_command python3
 
-# Install dependencies
-# Uncomment the relevant section:
+PYTHON_VERSION=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+PYTHON_MAJOR=$(echo "$PYTHON_VERSION" | cut -d. -f1)
+PYTHON_MINOR=$(echo "$PYTHON_VERSION" | cut -d. -f2)
 
-# Python:
-# cd "$PROJECT_DIR"
-# python3 -m venv .venv
-# source .venv/bin/activate
-# pip install -r requirements.txt
-
-# Node.js:
-# cd "$PROJECT_DIR"
-# npm install
-
-# Rust:
-# cd "$PROJECT_DIR"
-# cargo build
-
-# Setup environment
-if [ ! -f "$PROJECT_DIR/.env" ] && [ -f "$PROJECT_DIR/.env.example" ]; then
-    cp "$PROJECT_DIR/.env.example" "$PROJECT_DIR/.env"
-    echo "Created .env from .env.example - edit with your values."
+if [ "$PYTHON_MAJOR" -lt 3 ] || { [ "$PYTHON_MAJOR" -eq 3 ] && [ "$PYTHON_MINOR" -lt 11 ]; }; then
+    echo "ERROR: Python 3.11+ required, found $PYTHON_VERSION"
+    exit 1
 fi
+
+echo "Python $PYTHON_VERSION detected."
+
+cd "$PROJECT_DIR"
+
+if [ ! -d ".venv" ]; then
+    echo "Creating virtual environment..."
+    python3 -m venv .venv
+fi
+
+source .venv/bin/activate
+echo "Installing dependencies..."
+pip install -q -e ".[dev]"
 
 echo "=== Setup complete ==="
 
-# Verification
-# Uncomment and modify:
-# echo "Running verification..."
-# python3 -c "import PROJECT_NAME; print('OK')"
-# npm test
-# cargo test
+echo "Running verification..."
+python3 -c "import sqlite_checkpoint; print('OK')"

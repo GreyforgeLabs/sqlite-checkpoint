@@ -1,12 +1,12 @@
-# Contributing to PROJECT_NAME
+# Contributing to sqlite-checkpoint
 
 Thanks for your interest in contributing. This guide covers the process for submitting changes.
 
 ## Getting Started
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/PROJECT_NAME.git`
-3. Run setup: `cd PROJECT_NAME && ./scripts/setup.sh`
+2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/sqlite-checkpoint.git`
+3. Run setup: `cd sqlite-checkpoint && ./scripts/setup.sh`
 4. Create a branch: `git checkout -b your-feature`
 
 ## Development Workflow

@@ -6,7 +6,7 @@
 ## Quick Bootstrap
 
 ```bash
-git clone https://github.com/GreyforgeLabs/PROJECT_NAME.git && cd PROJECT_NAME && ./scripts/setup.sh
+git clone https://github.com/GreyforgeLabs/sqlite-checkpoint.git && cd sqlite-checkpoint && ./scripts/setup.sh
 ```
 
 ## What This Project Does
@@ -16,7 +16,7 @@ git clone https://github.com/GreyforgeLabs/PROJECT_NAME.git && cd PROJECT_NAME &
 ## Project Structure
 
 ```text
-PROJECT_NAME/
+sqlite-checkpoint/
   src/             # source code
   tests/           # test suite
   scripts/         # setup and utility scripts
@@ -32,8 +32,8 @@ PROJECT_NAME/
 
 ## Installation Steps
 
-1. Clone: `git clone https://github.com/GreyforgeLabs/PROJECT_NAME.git`
-2. Enter directory: `cd PROJECT_NAME`
+1. Clone: `git clone https://github.com/GreyforgeLabs/sqlite-checkpoint.git`
+2. Enter directory: `cd sqlite-checkpoint`
 3. Run setup: `./scripts/setup.sh`
 
 ## Verification

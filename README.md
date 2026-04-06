@@ -1,4 +1,4 @@
-# PROJECT_NAME
+# sqlite-checkpoint
 
 > One-line description of what this tool does.
 
@@ -11,8 +11,8 @@
 ## Quick Start
 
 ```bash
-git clone https://github.com/GreyforgeLabs/PROJECT_NAME.git
-cd PROJECT_NAME
+git clone https://github.com/GreyforgeLabs/sqlite-checkpoint.git
+cd sqlite-checkpoint
 ./scripts/setup.sh
 ```
 
