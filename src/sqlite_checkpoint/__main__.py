@@ -2,4 +2,4 @@
 
 from sqlite_checkpoint.cli import main
 
-main()
+raise SystemExit(main())

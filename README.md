@@ -1,12 +1,12 @@
 # sqlite-checkpoint
 
-> One-line description of what this tool does.
+> Atomic SQLite backup & snapshot tool using the WAL checkpoint and online backup APIs.
 
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 
 ## Why This Exists
 
-<!-- 2-3 sentences: the problem, the gap, the solution -->
+SQLite databases in WAL mode accumulate changes in a write-ahead log. Long-running applications need a reliable way to flush that log and create consistent backups without stopping writes. `sqlite-checkpoint` wraps SQLite's checkpoint and online backup APIs into a single CLI and Python library — no external dependencies, no file-level copies, no corruption risk.
 
 ## Quick Start
 
@@ -16,16 +16,62 @@ cd sqlite-checkpoint
 ./scripts/setup.sh
 ```
 
+Or install directly:
+
+```bash
+pip install .
+```
+
 ## Features
 
-- Feature 1
-- Feature 2
-- Feature 3
+- **WAL Checkpoint** — flush the write-ahead log with any mode (PASSIVE, FULL, RESTART, TRUNCATE)
+- **Atomic Backup** — create consistent backups via SQLite's online backup API, safe under concurrent writes
+- **Snapshot** — checkpoint + backup in a single operation (recommended workflow)
+- **Database Info** — inspect journal mode, WAL state, page counts, and freelist
+- **JSON Output** — machine-readable output for scripting and pipelines
+- **Zero Dependencies** — pure Python, uses only the stdlib `sqlite3` module
 
 ## Usage
 
 ```bash
-# Example command and output
+# Run a WAL checkpoint
+sqlite-checkpoint checkpoint myapp.db
+sqlite-checkpoint cp myapp.db -m truncate
+
+# Create an atomic backup
+sqlite-checkpoint backup myapp.db /backups/myapp-2026-04-06.db
+
+# Checkpoint + backup in one step (recommended)
+sqlite-checkpoint snapshot myapp.db /backups/myapp-snap.db
+
+# Inspect database state
+sqlite-checkpoint info myapp.db
+
+# JSON output for scripting
+sqlite-checkpoint --json snapshot myapp.db /backups/snap.db
+```
+
+### Python API
+
+```python
+from sqlite_checkpoint.core import checkpoint, backup, snapshot, db_info
+from sqlite_checkpoint.core import CheckpointMode
+
+# Flush the WAL
+result = checkpoint("myapp.db", mode=CheckpointMode.TRUNCATE)
+print(result.fully_checkpointed)  # True
+
+# Atomic backup
+result = backup("myapp.db", "backup.db")
+print(result.sha256)
+
+# Checkpoint + backup
+result = snapshot("myapp.db", "snapshot.db")
+print(result.backup.size_bytes)
+
+# Database info
+info = db_info("myapp.db")
+print(info["journal_mode"])  # "wal"
 ```
 
 ## Documentation
