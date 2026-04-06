@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import contextlib
 import hashlib
-import os
-import shutil
 import sqlite3
 import time
 from dataclasses import dataclass
@@ -80,11 +78,9 @@ def checkpoint(
     t0 = time.monotonic()
     conn = sqlite3.connect(str(db_path))
     try:
-        # wal_checkpoint returns (result, wal_pages, checkpointed_pages)
-        # result is 0 on success, 1 if BUSY (only for PASSIVE)
-        _, wal_pages, checkpointed = conn.execute(
-            f"PRAGMA wal_checkpoint({mode.value})"
-        ).fetchone()
+        # PRAGMA wal_checkpoint returns (result, wal_pages, checkpointed_pages).
+        # result: 0 = success, 1 = blocked by concurrent reader (PASSIVE only).
+        _, wal_pages, checkpointed = conn.execute(f"PRAGMA wal_checkpoint({mode.value})").fetchone()
     finally:
         conn.close()
     elapsed = (time.monotonic() - t0) * 1000

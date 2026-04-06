@@ -11,24 +11,31 @@ git clone https://github.com/GreyforgeLabs/sqlite-checkpoint.git && cd sqlite-ch
 
 ## What This Project Does
 
-<!-- 2-3 sentence description -->
+Atomic SQLite backup and snapshot tool. Wraps SQLite's WAL checkpoint and online backup APIs into a single CLI and Python library — zero dependencies, safe under concurrent writes, no corruption risk.
 
 ## Project Structure
 
 ```text
 sqlite-checkpoint/
-  src/             # source code
-  tests/           # test suite
-  scripts/         # setup and utility scripts
-  docs/            # documentation (if applicable)
-  README.md        # human-facing docs
-  STARTHERE.md     # this file
+  src/sqlite_checkpoint/
+    __init__.py         # package version
+    core.py             # checkpoint, backup, snapshot, db_info logic
+    cli.py              # argparse CLI entry point
+    __main__.py         # python -m sqlite_checkpoint support
+  tests/
+    test_core.py        # unit tests for core functions
+    test_cli.py         # CLI integration tests
+  scripts/
+    setup.sh            # idempotent install script
+  .github/workflows/    # CI, release, and PyPI publish workflows
+  README.md             # human-facing docs
+  STARTHERE.md          # this file
 ```
 
 ## Setup Prerequisites
 
-- <!-- language and version, e.g. Python 3.11+ -->
-- <!-- system deps, e.g. ffmpeg, libssl -->
+- Python 3.11+
+- No system dependencies required (uses stdlib `sqlite3`)
 
 ## Installation Steps
 
@@ -39,22 +46,32 @@ sqlite-checkpoint/
 ## Verification
 
 ```bash
-# Command that proves install worked
-# Expected output: ...
+source .venv/bin/activate
+sqlite-checkpoint --version
+# Expected output: sqlite-checkpoint 0.1.0
 ```
 
 ## Key Entry Points
 
-- `src/main.py` - main entry point (or equivalent)
+- `src/sqlite_checkpoint/cli.py` — CLI entry point (`sqlite-checkpoint` command)
+- `src/sqlite_checkpoint/core.py` — Python API (`checkpoint`, `backup`, `snapshot`, `db_info`)
 
 ## Configuration
 
-- Copy `.env.example` to `.env` and fill in values (if applicable)
+No configuration files or environment variables required. All options are passed via CLI flags or function arguments.
 
 ## Common Tasks
 
 ```bash
 # Run tests
+python -m pytest
+
 # Run linter
-# Build
+python -m ruff check .
+
+# Format code
+python -m ruff format .
+
+# Build distribution
+python -m build
 ```

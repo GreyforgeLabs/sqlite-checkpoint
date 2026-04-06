@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from pathlib import Path
 
 from sqlite_checkpoint import __version__
 from sqlite_checkpoint.core import (
@@ -53,9 +52,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     # snapshot (checkpoint + backup)
-    sn = sub.add_parser(
-        "snapshot", help="Checkpoint then backup (recommended)", aliases=["snap"]
-    )
+    sn = sub.add_parser("snapshot", help="Checkpoint then backup (recommended)", aliases=["snap"])
     sn.add_argument("database", help="Path to the SQLite database")
     sn.add_argument("destination", help="Path for the backup file")
     sn.add_argument(
@@ -114,15 +111,19 @@ def main(argv: list[str] | None = None) -> int:
 
 def _print_checkpoint(r: CheckpointResult, as_json: bool) -> None:
     if as_json:
-        print(json.dumps({
-            "command": "checkpoint",
-            "mode": r.mode.value,
-            "wal_pages": r.wal_pages,
-            "checkpointed_pages": r.checkpointed_pages,
-            "fully_checkpointed": r.fully_checkpointed,
-            "database": r.database,
-            "elapsed_ms": r.elapsed_ms,
-        }))
+        print(
+            json.dumps(
+                {
+                    "command": "checkpoint",
+                    "mode": r.mode.value,
+                    "wal_pages": r.wal_pages,
+                    "checkpointed_pages": r.checkpointed_pages,
+                    "fully_checkpointed": r.fully_checkpointed,
+                    "database": r.database,
+                    "elapsed_ms": r.elapsed_ms,
+                }
+            )
+        )
     else:
         status = "ok" if r.fully_checkpointed else "partial"
         print(f"checkpoint {r.mode.value} [{status}]")
@@ -133,16 +134,20 @@ def _print_checkpoint(r: CheckpointResult, as_json: bool) -> None:
 
 def _print_backup(r: BackupResult, as_json: bool) -> None:
     if as_json:
-        print(json.dumps({
-            "command": "backup",
-            "source": r.source,
-            "destination": r.destination,
-            "size_bytes": r.size_bytes,
-            "sha256": r.sha256,
-            "elapsed_ms": r.elapsed_ms,
-        }))
+        print(
+            json.dumps(
+                {
+                    "command": "backup",
+                    "source": r.source,
+                    "destination": r.destination,
+                    "size_bytes": r.size_bytes,
+                    "sha256": r.sha256,
+                    "elapsed_ms": r.elapsed_ms,
+                }
+            )
+        )
     else:
-        print(f"backup complete")
+        print("backup complete")
         print(f"  source:             {r.source}")
         print(f"  destination:        {r.destination}")
         print(f"  size:               {r.size_bytes:,} bytes")
@@ -152,22 +157,26 @@ def _print_backup(r: BackupResult, as_json: bool) -> None:
 
 def _print_snapshot(r: SnapshotResult, as_json: bool) -> None:
     if as_json:
-        print(json.dumps({
-            "command": "snapshot",
-            "checkpoint": {
-                "mode": r.checkpoint.mode.value,
-                "wal_pages": r.checkpoint.wal_pages,
-                "checkpointed_pages": r.checkpoint.checkpointed_pages,
-                "fully_checkpointed": r.checkpoint.fully_checkpointed,
-            },
-            "backup": {
-                "source": r.backup.source,
-                "destination": r.backup.destination,
-                "size_bytes": r.backup.size_bytes,
-                "sha256": r.backup.sha256,
-            },
-            "elapsed_ms": round(r.checkpoint.elapsed_ms + r.backup.elapsed_ms, 2),
-        }))
+        print(
+            json.dumps(
+                {
+                    "command": "snapshot",
+                    "checkpoint": {
+                        "mode": r.checkpoint.mode.value,
+                        "wal_pages": r.checkpoint.wal_pages,
+                        "checkpointed_pages": r.checkpoint.checkpointed_pages,
+                        "fully_checkpointed": r.checkpoint.fully_checkpointed,
+                    },
+                    "backup": {
+                        "source": r.backup.source,
+                        "destination": r.backup.destination,
+                        "size_bytes": r.backup.size_bytes,
+                        "sha256": r.backup.sha256,
+                    },
+                    "elapsed_ms": round(r.checkpoint.elapsed_ms + r.backup.elapsed_ms, 2),
+                }
+            )
+        )
     else:
         status = "ok" if r.checkpoint.fully_checkpointed else "partial"
         print(f"snapshot complete [checkpoint {status}]")
@@ -184,7 +193,7 @@ def _print_info(info: dict, as_json: bool) -> None:
     if as_json:
         print(json.dumps({"command": "info", **info}))
     else:
-        print(f"database info")
+        print("database info")
         print(f"  path:               {info['path']}")
         print(f"  size:               {info['size_bytes']:,} bytes")
         print(f"  journal mode:       {info['journal_mode']}")
