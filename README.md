@@ -86,4 +86,4 @@ AGPL-3.0. See [LICENSE](LICENSE) for details.
 
 ---
 
-Built by [Greyforge](https://greyforge.tech)
+Built by [Greyforge](https://greyforge.tech) · [Read the Chronicle](https://greyforge.tech/chronicles/sqlite-checkpoint-atomic-backups)
