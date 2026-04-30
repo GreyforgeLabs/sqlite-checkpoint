@@ -4,6 +4,10 @@
 
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 
+<p align="center">
+  <img src="docs/assets/openforge-sqlite-checkpoint.webp" alt="sqlite-checkpoint OpenForge project artwork" width="720">
+</p>
+
 ## Why This Exists
 
 SQLite databases in WAL mode accumulate changes in a write-ahead log. Long-running applications need a reliable way to flush that log and create consistent backups without stopping writes. `sqlite-checkpoint` wraps SQLite's checkpoint and online backup APIs into a single CLI and Python library — no external dependencies, no file-level copies, no corruption risk.
