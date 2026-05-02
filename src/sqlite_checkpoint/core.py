@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import contextlib
 import hashlib
+import os
 import sqlite3
 import time
 from dataclasses import dataclass
@@ -25,6 +26,7 @@ class CheckpointResult:
     """Result of a WAL checkpoint operation."""
 
     mode: CheckpointMode
+    busy: bool
     wal_pages: int
     checkpointed_pages: int
     database: str
@@ -32,7 +34,7 @@ class CheckpointResult:
 
     @property
     def fully_checkpointed(self) -> bool:
-        return self.wal_pages == self.checkpointed_pages
+        return not self.busy and self.wal_pages == self.checkpointed_pages
 
 
 @dataclass(frozen=True)
@@ -80,13 +82,14 @@ def checkpoint(
     try:
         # PRAGMA wal_checkpoint returns (result, wal_pages, checkpointed_pages).
         # result: 0 = success, 1 = blocked by concurrent reader (PASSIVE only).
-        _, wal_pages, checkpointed = conn.execute(f"PRAGMA wal_checkpoint({mode.value})").fetchone()
+        busy, wal_pages, checkpointed = conn.execute(f"PRAGMA wal_checkpoint({mode.value})").fetchone()
     finally:
         conn.close()
     elapsed = (time.monotonic() - t0) * 1000
 
     return CheckpointResult(
         mode=mode,
+        busy=bool(busy),
         wal_pages=max(wal_pages, 0),
         checkpointed_pages=max(checkpointed, 0),
         database=str(db_path),
@@ -127,22 +130,32 @@ def backup(
     if dest_path.exists():
         raise FileExistsError(f"Destination already exists: {dest_path}")
 
+    tmp_path = dest_path.with_name(f".{dest_path.name}.tmp-{os.getpid()}-{time.time_ns()}")
     t0 = time.monotonic()
     source = sqlite3.connect(str(db_path))
-    dest = sqlite3.connect(str(dest_path))
+    dest = sqlite3.connect(str(tmp_path))
     try:
         source.backup(dest, pages=pages_per_step, sleep=pause_ms / 1000)
-    except Exception:
         dest.close()
-        with contextlib.suppress(OSError):
-            dest_path.unlink()
         source.close()
+        _quick_check(tmp_path)
+        # Atomic no-clobber publish: link succeeds only if dest_path does not exist.
+        os.link(tmp_path, dest_path)
+    except Exception:
+        with contextlib.suppress(OSError):
+            tmp_path.unlink()
+        with contextlib.suppress(Exception):
+            dest.close()
+        with contextlib.suppress(Exception):
+            source.close()
         raise
     finally:
         with contextlib.suppress(Exception):
             dest.close()
         with contextlib.suppress(Exception):
             source.close()
+        with contextlib.suppress(OSError):
+            tmp_path.unlink()
 
     elapsed = (time.monotonic() - t0) * 1000
     size = dest_path.stat().st_size
@@ -225,3 +238,14 @@ def _sha256(path: Path) -> str:
         for chunk in iter(lambda: f.read(1 << 16), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def _quick_check(path: Path) -> None:
+    """Validate a SQLite file before publishing it."""
+    conn = sqlite3.connect(str(path))
+    try:
+        result = conn.execute("PRAGMA quick_check").fetchone()
+    finally:
+        conn.close()
+    if not result or result[0] != "ok":
+        raise sqlite3.DatabaseError(f"SQLite quick_check failed for temporary backup: {result!r}")

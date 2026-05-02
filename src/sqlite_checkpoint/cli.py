@@ -116,6 +116,7 @@ def _print_checkpoint(r: CheckpointResult, as_json: bool) -> None:
                 {
                     "command": "checkpoint",
                     "mode": r.mode.value,
+                    "busy": r.busy,
                     "wal_pages": r.wal_pages,
                     "checkpointed_pages": r.checkpointed_pages,
                     "fully_checkpointed": r.fully_checkpointed,
@@ -125,8 +126,9 @@ def _print_checkpoint(r: CheckpointResult, as_json: bool) -> None:
             )
         )
     else:
-        status = "ok" if r.fully_checkpointed else "partial"
+        status = "busy" if r.busy else ("ok" if r.fully_checkpointed else "partial")
         print(f"checkpoint {r.mode.value} [{status}]")
+        print(f"  busy:               {'yes' if r.busy else 'no'}")
         print(f"  wal pages:          {r.wal_pages}")
         print(f"  checkpointed:       {r.checkpointed_pages}")
         print(f"  elapsed:            {r.elapsed_ms} ms")
@@ -163,6 +165,7 @@ def _print_snapshot(r: SnapshotResult, as_json: bool) -> None:
                     "command": "snapshot",
                     "checkpoint": {
                         "mode": r.checkpoint.mode.value,
+                        "busy": r.checkpoint.busy,
                         "wal_pages": r.checkpoint.wal_pages,
                         "checkpointed_pages": r.checkpoint.checkpointed_pages,
                         "fully_checkpointed": r.checkpoint.fully_checkpointed,
@@ -178,8 +181,9 @@ def _print_snapshot(r: SnapshotResult, as_json: bool) -> None:
             )
         )
     else:
-        status = "ok" if r.checkpoint.fully_checkpointed else "partial"
+        status = "busy" if r.checkpoint.busy else ("ok" if r.checkpoint.fully_checkpointed else "partial")
         print(f"snapshot complete [checkpoint {status}]")
+        print(f"  checkpoint busy:    {'yes' if r.checkpoint.busy else 'no'}")
         print(f"  wal pages:          {r.checkpoint.wal_pages}")
         print(f"  checkpointed:       {r.checkpoint.checkpointed_pages}")
         print(f"  destination:        {r.backup.destination}")

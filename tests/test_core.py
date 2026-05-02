@@ -21,6 +21,7 @@ class TestCheckpoint:
         result = checkpoint(wal_db)
         assert isinstance(result, CheckpointResult)
         assert result.mode == CheckpointMode.PASSIVE
+        assert result.busy is False
         assert result.elapsed_ms >= 0
 
     def test_truncate_checkpoint(self, wal_db):
@@ -57,6 +58,12 @@ class TestBackup:
         dest.write_bytes(b"existing")
         with pytest.raises(FileExistsError):
             backup(wal_db, dest)
+
+    def test_backup_leaves_no_temp_file(self, wal_db, tmp_path):
+        dest = tmp_path / "backup.db"
+        backup(wal_db, dest)
+        assert dest.exists()
+        assert not list(tmp_path.glob(".backup.db.tmp-*"))
 
     def test_missing_source(self, tmp_path):
         with pytest.raises(FileNotFoundError):
