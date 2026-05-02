@@ -181,7 +181,11 @@ def _print_snapshot(r: SnapshotResult, as_json: bool) -> None:
             )
         )
     else:
-        status = "busy" if r.checkpoint.busy else ("ok" if r.checkpoint.fully_checkpointed else "partial")
+        status = (
+            "busy"
+            if r.checkpoint.busy
+            else ("ok" if r.checkpoint.fully_checkpointed else "partial")
+        )
         print(f"snapshot complete [checkpoint {status}]")
         print(f"  checkpoint busy:    {'yes' if r.checkpoint.busy else 'no'}")
         print(f"  wal pages:          {r.checkpoint.wal_pages}")

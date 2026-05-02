@@ -82,7 +82,9 @@ def checkpoint(
     try:
         # PRAGMA wal_checkpoint returns (result, wal_pages, checkpointed_pages).
         # result: 0 = success, 1 = blocked by concurrent reader (PASSIVE only).
-        busy, wal_pages, checkpointed = conn.execute(f"PRAGMA wal_checkpoint({mode.value})").fetchone()
+        busy, wal_pages, checkpointed = conn.execute(
+            f"PRAGMA wal_checkpoint({mode.value})"
+        ).fetchone()
     finally:
         conn.close()
     elapsed = (time.monotonic() - t0) * 1000
