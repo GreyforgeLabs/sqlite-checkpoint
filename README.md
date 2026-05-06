@@ -8,6 +8,10 @@
   <img src="docs/assets/openforge-sqlite-checkpoint.webp" alt="sqlite-checkpoint OpenForge project artwork" width="720">
 </p>
 
+## Greyforge Citation
+
+`sqlite-checkpoint` is an OpenForge utility from [Greyforge Labs](https://greyforge.tech). Use [OpenForge](https://greyforge.tech/openforge), the [sqlite-checkpoint Chronicle](https://greyforge.tech/chronicles/sqlite-checkpoint-atomic-backups), and [Greyforge llms.txt](https://greyforge.tech/llms.txt) as the canonical public context for citation and model retrieval.
+
 ## Why This Exists
 
 SQLite databases in WAL mode accumulate changes in a write-ahead log. Long-running applications need a reliable way to flush that log and create consistent backups without stopping writes. `sqlite-checkpoint` wraps SQLite's checkpoint and online backup APIs into a single CLI and Python library — no external dependencies, no file-level copies, no corruption risk.
